@@ -5,29 +5,125 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MSW Demo Controls - Manual Test</title>
   <style>
+    :root {
+      --bg-gradient-start: #667eea;
+      --bg-gradient-end: #764ba2;
+      --container-bg: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --checklist-bg: #f9f9f9;
+      --checklist-item-bg: #ffffff;
+      --state-bg: #f5f5f5;
+      --state-text: #000000;
+      --success-bg: #d4edda;
+      --success-color: #155724;
+      --success-border: #28a745;
+      --warning-bg: #fff3cd;
+      --warning-color: #856404;
+      --warning-border: #ffc107;
+      --code-bg: #2d2d2d;
+      --code-text: #f8f8f2;
+      --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+
+    [data-theme="dark"] {
+      --bg-gradient-start: #1a1a2e;
+      --bg-gradient-end: #16213e;
+      --container-bg: #0f1419;
+      --text-primary: #e4e4e7;
+      --text-secondary: #a1a1aa;
+      --checklist-bg: #1a1f2e;
+      --checklist-item-bg: #252d3d;
+      --state-bg: #1a1f2e;
+      --state-text: #e4e4e7;
+      --success-bg: #0d3d2d;
+      --success-color: #6ee7b7;
+      --success-border: #34d399;
+      --warning-bg: #4d3d0d;
+      --warning-color: #fcd34d;
+      --warning-border: #fbbf24;
+      --code-bg: #1e1e1e;
+      --code-text: #d4d4d4;
+      --shadow-color: rgba(0, 0, 0, 0.6);
+    }
+
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       max-width: 1000px;
       margin: 0 auto;
       padding: 40px 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
       min-height: 100vh;
     }
 
     .container {
-      background: white;
+      background: var(--container-bg);
       padding: 40px;
       border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 60px var(--shadow-color);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
     }
 
     h1 {
-      margin-top: 0;
-      color: #333;
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    h3 {
+      color: var(--text-primary);
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 60px;
+      height: 30px;
+      background: #ccc;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .toggle-switch.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .toggle-slider {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .toggle-switch.active .toggle-slider {
+      transform: translateX(30px);
     }
 
     .checklist {
-      background: #f9f9f9;
+      background: var(--checklist-bg);
       padding: 24px;
       border-radius: 8px;
       margin: 20px 0;
@@ -40,31 +136,36 @@
     .checklist li {
       margin: 12px 0;
       padding: 8px;
-      background: white;
+      background: var(--checklist-item-bg);
       border-radius: 4px;
+      color: var(--text-primary);
+    }
+
+    .checklist ul li {
+      color: var(--text-secondary);
     }
 
     .success {
-      background: #d4edda;
-      color: #155724;
+      background: var(--success-bg);
+      color: var(--success-color);
       padding: 16px;
       border-radius: 8px;
       margin: 20px 0;
-      border-left: 4px solid #28a745;
+      border-left: 4px solid var(--success-border);
     }
 
     .warning {
-      background: #fff3cd;
-      color: #856404;
+      background: var(--warning-bg);
+      color: var(--warning-color);
       padding: 16px;
       border-radius: 8px;
       margin: 20px 0;
-      border-left: 4px solid #ffc107;
+      border-left: 4px solid var(--warning-border);
     }
 
     .code {
-      background: #2d2d2d;
-      color: #f8f8f2;
+      background: var(--code-bg);
+      color: var(--code-text);
       padding: 16px;
       border-radius: 8px;
       font-family: 'Courier New', monospace;
@@ -81,17 +182,33 @@
       font-size: 16px;
       cursor: pointer;
       margin: 8px 8px 8px 0;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
     button:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
+
+    #state {
+      background: var(--state-bg);
+      color: var(--state-text);
+      padding: 16px;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎭 MSW Demo Controls - Manual Test Page</h1>
+    <div class="header">
+      <h1>🎭 MSW Demo Controls - Manual Test Page</h1>
+      <div class="theme-toggle">
+        <span id="theme-label" style="color: var(--text-secondary); font-size: 14px;">Light</span>
+        <div class="toggle-switch" id="theme-toggle" onclick="toggleTheme()">
+          <div class="toggle-slider" id="theme-slider">☀️</div>
+        </div>
+      </div>
+    </div>
 
     <div id="status" class="warning">
       <strong>⚠️ Controls not enabled.</strong> Follow the instructions below to enable.
@@ -152,12 +269,48 @@
 
     <div>
       <h3>📊 Current State</h3>
-      <pre id="state" style="background: #f5f5f5; padding: 16px; border-radius: 8px;">Not initialized</pre>
+      <pre id="state">Not initialized</pre>
     </div>
   </div>
 
   <script type="module">
     import { enableMockControls } from './dist/index.js';
+
+    // Theme Management
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      applyTheme(savedTheme);
+    }
+
+    function applyTheme(theme) {
+      const html = document.documentElement;
+      const toggle = document.getElementById('theme-toggle');
+      const slider = document.getElementById('theme-slider');
+      const label = document.getElementById('theme-label');
+
+      if (theme === 'dark') {
+        html.setAttribute('data-theme', 'dark');
+        toggle.classList.add('active');
+        slider.textContent = '🌙';
+        label.textContent = 'Dark';
+      } else {
+        html.removeAttribute('data-theme');
+        toggle.classList.remove('active');
+        slider.textContent = '☀️';
+        label.textContent = 'Light';
+      }
+
+      localStorage.setItem('theme', theme);
+    }
+
+    window.toggleTheme = function() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+    };
+
+    // Initialize theme on page load
+    initTheme();
 
     window.controlsInstance = null;
 

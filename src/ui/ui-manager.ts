@@ -14,6 +14,7 @@ export class UIManager {
   private isModalOpen: boolean = false;
   private clickListener: ((e: Event) => void) | null = null;
   private escapeListener: ((e: KeyboardEvent) => void) | null = null;
+  private themeObserver: MutationObserver | null = null;
 
   constructor(
     private state: StateManager,
@@ -25,6 +26,8 @@ export class UIManager {
     this.injectStyles();
     this.render();
     this.attachEventListeners();
+    this.syncTheme();
+    this.watchThemeChanges();
 
     // Listen to state changes to update UI
     this.state.onChange(() => {
@@ -157,6 +160,32 @@ export class UIManager {
   }
 
   /**
+   * Sync theme from parent document to shadow host
+   */
+  private syncTheme(): void {
+    const theme = document.documentElement.getAttribute('data-theme');
+    if (theme) {
+      this.container.setAttribute('data-theme', theme);
+    } else {
+      this.container.removeAttribute('data-theme');
+    }
+  }
+
+  /**
+   * Watch for theme changes in parent document
+   */
+  private watchThemeChanges(): void {
+    this.themeObserver = new MutationObserver(() => {
+      this.syncTheme();
+    });
+
+    this.themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+  }
+
+  /**
    * Attach event listeners using event delegation
    */
   private attachEventListeners(): void {
@@ -246,6 +275,11 @@ export class UIManager {
     if (this.escapeListener) {
       document.removeEventListener('keydown', this.escapeListener);
       this.escapeListener = null;
+    }
+
+    if (this.themeObserver) {
+      this.themeObserver.disconnect();
+      this.themeObserver = null;
     }
 
     this.container.remove();

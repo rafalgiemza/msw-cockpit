@@ -7,10 +7,32 @@ export function getStyles(): string {
     :host {
       all: initial;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      /* Light mode colors (default) */
+      --modal-bg: #ffffff;
+      --modal-border: #e0e0e0;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --hover-bg: #f0f0f0;
+      --active-bg: #667eea22;
+      --active-border: #667eea;
+      --backdrop-bg: rgba(0, 0, 0, 0.5);
+    }
+
+    :host([data-theme="dark"]) {
+      /* Dark mode colors */
+      --modal-bg: #1a1f2e;
+      --modal-border: #2d3548;
+      --text-primary: #e4e4e7;
+      --text-secondary: #a1a1aa;
+      --hover-bg: #252d3d;
+      --active-bg: #667eea44;
+      --active-border: #8b9bff;
+      --backdrop-bg: rgba(0, 0, 0, 0.7);
     }
 
     * {
       box-sizing: border-box;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
 
     /* Trigger Button */
@@ -50,7 +72,7 @@ export function getStyles(): string {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: var(--backdrop-bg);
       z-index: inherit;
       align-items: center;
       justify-content: center;
@@ -72,7 +94,7 @@ export function getStyles(): string {
 
     /* Modal Container */
     .msw-modal {
-      background: #ffffff;
+      background: var(--modal-bg);
       border-radius: 12px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       max-width: 500px;
@@ -98,7 +120,7 @@ export function getStyles(): string {
     /* Modal Header */
     .msw-modal-header {
       padding: 24px;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid var(--modal-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -108,7 +130,7 @@ export function getStyles(): string {
       margin: 0;
       font-size: 20px;
       font-weight: 600;
-      color: #333333;
+      color: var(--text-primary);
     }
 
     .msw-modal-close {
@@ -116,7 +138,7 @@ export function getStyles(): string {
       border: none;
       font-size: 24px;
       cursor: pointer;
-      color: #666666;
+      color: var(--text-secondary);
       padding: 0;
       width: 32px;
       height: 32px;
@@ -128,7 +150,7 @@ export function getStyles(): string {
     }
 
     .msw-modal-close:hover {
-      background: #f0f0f0;
+      background: var(--hover-bg);
     }
 
     .msw-modal-close:focus {
@@ -154,7 +176,7 @@ export function getStyles(): string {
     .msw-dimension-label {
       font-size: 14px;
       font-weight: 600;
-      color: #333333;
+      color: var(--text-primary);
       margin: 0 0 12px 0;
     }
 
@@ -171,9 +193,9 @@ export function getStyles(): string {
       align-items: center;
       gap: 12px;
       padding: 12px 16px;
-      border: 2px solid #e0e0e0;
+      border: 2px solid var(--modal-border);
       border-radius: 8px;
-      background: #ffffff;
+      background: var(--modal-bg);
       cursor: pointer;
       transition: all 0.2s ease;
       text-align: left;
@@ -181,7 +203,7 @@ export function getStyles(): string {
     }
 
     .msw-scenario:hover {
-      background: #f0f0f0;
+      background: var(--hover-bg);
     }
 
     .msw-scenario:focus {
@@ -190,8 +212,8 @@ export function getStyles(): string {
     }
 
     .msw-scenario.active {
-      background: #667eea22;
-      border-color: #667eea;
+      background: var(--active-bg);
+      border-color: var(--active-border);
     }
 
     .msw-scenario-icon {
@@ -209,12 +231,12 @@ export function getStyles(): string {
     .msw-scenario-label {
       font-size: 14px;
       font-weight: 500;
-      color: #333333;
+      color: var(--text-primary);
     }
 
     .msw-scenario-description {
       font-size: 12px;
-      color: #666666;
+      color: var(--text-secondary);
       opacity: 0.7;
     }
 
@@ -222,7 +244,7 @@ export function getStyles(): string {
     .msw-empty {
       padding: 40px 20px;
       text-align: center;
-      color: #666666;
+      color: var(--text-secondary);
     }
 
     .msw-empty-icon {
