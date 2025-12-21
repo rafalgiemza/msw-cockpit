@@ -1,5 +1,5 @@
-import type { NormalizedConfig, URLStrategy } from './types.js';
-import type { StateManager } from './state.js';
+import type { NormalizedConfig } from "./types.js";
+import type { StateManager } from "./state.js";
 
 /**
  * URL synchronizer for bidirectional state <-> URL sync
@@ -9,10 +9,7 @@ import type { StateManager } from './state.js';
 export class URLSynchronizer {
   private popstateListener: (() => void) | null = null;
 
-  constructor(
-    private state: StateManager,
-    private config: NormalizedConfig
-  ) {
+  constructor(private state: StateManager, private config: NormalizedConfig) {
     this.setupListeners();
   }
 
@@ -29,7 +26,7 @@ export class URLSynchronizer {
     this.popstateListener = () => {
       this.syncFromURL();
     };
-    window.addEventListener('popstate', this.popstateListener);
+    window.addEventListener("popstate", this.popstateListener);
   }
 
   /**
@@ -50,8 +47,9 @@ export class URLSynchronizer {
     });
 
     // Apply URL update strategy
-    const method = this.config.urlStrategy === 'push' ? 'pushState' : 'replaceState';
-    window.history[method]({}, '', url.toString());
+    const method =
+      this.config.urlStrategy === "push" ? "pushState" : "replaceState";
+    window.history[method]({}, "", url.toString());
   }
 
   /**
@@ -68,7 +66,7 @@ export class URLSynchronizer {
    */
   destroy(): void {
     if (this.popstateListener) {
-      window.removeEventListener('popstate', this.popstateListener);
+      window.removeEventListener("popstate", this.popstateListener);
       this.popstateListener = null;
     }
   }

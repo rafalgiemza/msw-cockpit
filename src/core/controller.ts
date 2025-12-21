@@ -4,10 +4,10 @@ import type {
   ScenarioState,
   StateListener,
   Unsubscribe,
-} from './types.js';
-import { StateManager } from './state.js';
-import { URLSynchronizer } from './url.js';
-import { UIManager } from '../ui/ui-manager.js';
+} from "./types.js";
+import { StateManager } from "./state.js";
+import { URLSynchronizer } from "./url.js";
+import { UIManager } from "../ui/ui-manager.js";
 
 /**
  * Main controller that orchestrates all components
@@ -18,7 +18,7 @@ export class MockController implements MockControlsInstance {
   private urlSync: URLSynchronizer;
   private uiManager: UIManager;
 
-  constructor(private config: NormalizedConfig) {
+  constructor(config: NormalizedConfig) {
     // Create state manager
     this.stateManager = new StateManager(config);
 

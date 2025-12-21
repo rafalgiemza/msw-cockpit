@@ -1,4 +1,4 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
 export default defineConfig({
   entry: { index: 'src/index.ts' },
@@ -8,7 +8,6 @@ export default defineConfig({
   clean: true,
   minify: true,
   treeshake: true,
-  splitting: false,
   outDir: 'dist',
   platform: 'browser',
   target: 'es2020',
