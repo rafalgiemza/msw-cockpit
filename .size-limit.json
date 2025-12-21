@@ -1,0 +1,8 @@
+[
+  {
+    "name": "Core (vanilla JS)",
+    "path": "dist/index.js",
+    "limit": "15 KB",
+    "gzip": true
+  }
+]

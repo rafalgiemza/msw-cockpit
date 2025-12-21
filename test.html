@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MSW Demo Controls - Manual Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    .checklist {
+      background: #f9f9f9;
+      padding: 24px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    .checklist h3 {
+      margin-top: 0;
+    }
+
+    .checklist li {
+      margin: 12px 0;
+      padding: 8px;
+      background: white;
+      border-radius: 4px;
+    }
+
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid #28a745;
+    }
+
+    .warning {
+      background: #fff3cd;
+      color: #856404;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid #ffc107;
+    }
+
+    .code {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 8px 8px 8px 0;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎭 MSW Demo Controls - Manual Test Page</h1>
+
+    <div id="status" class="warning">
+      <strong>⚠️ Controls not enabled.</strong> Follow the instructions below to enable.
+    </div>
+
+    <div class="checklist">
+      <h3>✅ Manual Testing Checklist</h3>
+      <ol>
+        <li><strong>Enable the controls:</strong> Click the button below or run in console:
+          <div class="code">localStorage.setItem("MSW_DEMO_CONTROLS_ENABLED", "true")</div>
+          <button onclick="enableControls()">Enable Controls</button>
+        </li>
+        <li><strong>Check for trigger button:</strong> Look for a floating 🎭 button in the bottom-right corner</li>
+        <li><strong>Click trigger button:</strong> Modal should open with smooth animation</li>
+        <li><strong>Select scenarios:</strong> Click different scenarios to test
+          <ul>
+            <li>Default - Normal state</li>
+            <li>Error - Error state (with ❌ icon)</li>
+            <li>Loading - Loading state (with ⏳ icon)</li>
+            <li>Empty - Empty state (with 📭 icon)</li>
+          </ul>
+        </li>
+        <li><strong>Check URL updates:</strong> URL should update with ?scenario=error when you select a scenario</li>
+        <li><strong>Test browser navigation:</strong>
+          <ul>
+            <li>Click browser back button - scenario should revert</li>
+            <li>Click browser forward button - scenario should restore</li>
+          </ul>
+        </li>
+        <li><strong>Test keyboard:</strong>
+          <ul>
+            <li>Press Tab to navigate scenarios</li>
+            <li>Press Enter to select</li>
+            <li>Press Escape to close modal</li>
+          </ul>
+        </li>
+        <li><strong>Click outside modal:</strong> Should close the modal</li>
+        <li><strong>Check styles isolation:</strong> Controls should look good and not affect page styles</li>
+        <li><strong>Test different positions:</strong> Use buttons below to test different positions</li>
+      </ol>
+    </div>
+
+    <div>
+      <h3>🎨 Test Different Positions</h3>
+      <button onclick="setPosition('top-left')">Top Left</button>
+      <button onclick="setPosition('top-right')">Top Right</button>
+      <button onclick="setPosition('bottom-left')">Bottom Left</button>
+      <button onclick="setPosition('bottom-right')">Bottom Right (Default)</button>
+    </div>
+
+    <div>
+      <h3>🧪 Test Different Scenarios</h3>
+      <button onclick="changeScenario('default')">Default</button>
+      <button onclick="changeScenario('error')">Error</button>
+      <button onclick="changeScenario('loading')">Loading</button>
+      <button onclick="changeScenario('empty')">Empty</button>
+    </div>
+
+    <div>
+      <h3>📊 Current State</h3>
+      <pre id="state" style="background: #f5f5f5; padding: 16px; border-radius: 8px;">Not initialized</pre>
+    </div>
+  </div>
+
+  <script type="module">
+    import { enableMockControls } from './dist/index.js';
+
+    window.controlsInstance = null;
+
+    function updateStatus(enabled) {
+      const statusDiv = document.getElementById('status');
+      if (enabled) {
+        statusDiv.className = 'success';
+        statusDiv.innerHTML = '<strong>✅ Controls enabled!</strong> Look for the 🎭 button in the corner.';
+      } else {
+        statusDiv.className = 'warning';
+        statusDiv.innerHTML = '<strong>⚠️ Controls not enabled.</strong> Click the "Enable Controls" button below.';
+      }
+    }
+
+    function updateState(state) {
+      document.getElementById('state').textContent = JSON.stringify(state, null, 2);
+    }
+
+    function initControls(position = 'bottom-right') {
+      if (window.controlsInstance) {
+        window.controlsInstance.destroy();
+      }
+
+      window.controlsInstance = enableMockControls({
+        scenarios: [
+          {
+            id: 'default',
+            label: 'Default State',
+            icon: '✅',
+            description: 'Normal API responses'
+          },
+          {
+            id: 'error',
+            label: 'Error State',
+            icon: '❌',
+            description: 'Simulates 500 server error'
+          },
+          {
+            id: 'loading',
+            label: 'Slow Loading',
+            icon: '⏳',
+            description: 'Delayed responses (3s)'
+          },
+          {
+            id: 'empty',
+            label: 'Empty State',
+            icon: '📭',
+            description: 'No data returned'
+          }
+        ],
+        ui: {
+          position: position
+        },
+        onChange: (state) => {
+          console.log('Scenario changed:', state);
+          updateState(state);
+        }
+      });
+
+      if (window.controlsInstance) {
+        updateStatus(true);
+        updateState(window.controlsInstance.getState());
+      } else {
+        updateStatus(false);
+      }
+    }
+
+    window.enableControls = function() {
+      localStorage.setItem('MSW_DEMO_CONTROLS_ENABLED', 'true');
+      location.reload();
+    };
+
+    window.setPosition = function(position) {
+      initControls(position);
+    };
+
+    window.changeScenario = function(scenarioId) {
+      if (window.controlsInstance) {
+        window.controlsInstance.applyScenario('scenario', scenarioId);
+      } else {
+        alert('Please enable controls first!');
+      }
+    };
+
+    // Initialize on page load
+    initControls();
+  </script>
+</body>
+</html>
