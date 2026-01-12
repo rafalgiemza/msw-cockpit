@@ -7,15 +7,17 @@ import type {
 } from "./types.js";
 import { StateManager } from "./state.js";
 import { URLSynchronizer } from "./url.js";
+import { LocalStorageSynchronizer } from "./storage.js";
 import { UIManager } from "../ui/ui-manager.js";
 
 /**
  * Main controller that orchestrates all components
- * Manages state, URL sync, and UI
+ * Manages state, URL sync, localStorage sync, and UI
  */
 export class MockController implements MockControlsInstance {
   private stateManager: StateManager;
   private urlSync: URLSynchronizer;
+  private storageSync: LocalStorageSynchronizer;
   private uiManager: UIManager;
 
   constructor(config: NormalizedConfig) {
@@ -24,6 +26,9 @@ export class MockController implements MockControlsInstance {
 
     // Create URL synchronizer
     this.urlSync = new URLSynchronizer(this.stateManager, config);
+
+    // Create localStorage synchronizer
+    this.storageSync = new LocalStorageSynchronizer(this.stateManager, config);
 
     // Create UI manager
     this.uiManager = new UIManager(
@@ -65,6 +70,7 @@ export class MockController implements MockControlsInstance {
   destroy(): void {
     this.uiManager.destroy();
     this.urlSync.destroy();
+    this.storageSync.destroy();
     this.stateManager.destroy();
   }
 }

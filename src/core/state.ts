@@ -4,6 +4,7 @@ import type {
   StateListener,
   Unsubscribe,
 } from './types.js';
+import { LocalStorageSynchronizer } from './storage.js';
 
 /**
  * State manager for scenario selection
@@ -14,21 +15,23 @@ export class StateManager {
   private listeners: Set<StateListener> = new Set();
 
   constructor(private config: NormalizedConfig) {
-    this.initializeFromURL();
+    this.initialize();
   }
 
   /**
-   * Initialize state from URL parameters
-   * URL params have highest priority
+   * Initialize state from URL, localStorage, or defaults
+   * Priority: URL > localStorage > default
    */
-  private initializeFromURL(): void {
+  private initialize(): void {
     const params = new URLSearchParams(window.location.search);
+    const storedValues = LocalStorageSynchronizer.getInitialValues();
 
     this.config.dimensions.forEach((dimension) => {
       const urlValue = params.get(dimension.paramName);
+      const storageValue = storedValues?.[dimension.id];
       const defaultValue = dimension.defaultValue;
 
-      const value = urlValue || defaultValue;
+      const value = urlValue || storageValue || defaultValue;
       if (value) {
         this.values.set(dimension.id, value);
       }
@@ -67,6 +70,21 @@ export class StateManager {
   setValuesFromURL(params: URLSearchParams): void {
     this.config.dimensions.forEach((dimension) => {
       const value = params.get(dimension.paramName);
+      if (value) {
+        this.values.set(dimension.id, value);
+      } else {
+        this.values.delete(dimension.id);
+      }
+    });
+  }
+
+  /**
+   * Set values from localStorage (without triggering onChange)
+   * Used when syncing from other tabs via storage event
+   */
+  setValuesFromStorage(values: Record<string, string>): void {
+    this.config.dimensions.forEach((dimension) => {
+      const value = values[dimension.id];
       if (value) {
         this.values.set(dimension.id, value);
       } else {
