@@ -1,4 +1,4 @@
-# 🎭 MSW Demo Controls
+# 🎭 MSW Cockpit
 
 > UI overlay for controlling Mock Service Worker (MSW) scenarios during live demos and presentations
 
@@ -34,10 +34,10 @@ pnpm add msw-cockpit
 
 ### 1. Enable the Controls
 
-MSW Demo Controls requires a localStorage flag to prevent accidental production deployment. Open your browser console and run:
+MSW Cockpit requires a localStorage flag to prevent accidental production deployment. Open your browser console and run:
 
 ```javascript
-localStorage.setItem("MSW_DEMO_CONTROLS_ENABLED", "true");
+localStorage.setItem("MSW_COCKPIT__ENABLED", "true");
 ```
 
 Then reload the page.
@@ -204,7 +204,7 @@ Main function to enable the controls. Returns `null` if not enabled or browser n
 | `ui.position` | `Position` | `'bottom-right'` | Button position (`'top-left'`, `'top-right'`, `'bottom-left'`, `'bottom-right'`) |
 | `ui.theme` | `Theme` | `'light'` | UI theme (`'light'` or `'dark'`) |
 | `ui.trigger.icon` | `string` | `'🎭'` | Custom icon for trigger button |
-| `ui.trigger.label` | `string` | `'MSW Demo Controls'` | Accessibility label |
+| `ui.trigger.label` | `string` | `'MSW Cockpit'` | Accessibility label |
 | `ui.zIndex` | `number` | `999999` | Z-index for the controls |
 
 #### ScenarioDefinition
@@ -242,7 +242,7 @@ interface MockControlsInstance {
 The controls **will not render** without the localStorage flag:
 
 ```javascript
-localStorage.setItem("MSW_DEMO_CONTROLS_ENABLED", "true");
+localStorage.setItem("MSW_COCKPIT__ENABLED", "true");
 ```
 
 This prevents accidentally shipping demo controls to production. The library will log a helpful warning if the flag is not set.

@@ -17,7 +17,6 @@ function updateStateDisplay(state) {
 // Initialize on page load
 updateURLDisplay();
 
-// Enable MSW Demo Controls
 const controls = enableMockControls({
   scenarios: [
     'default',
@@ -32,13 +31,13 @@ const controls = enableMockControls({
 });
 
 if (controls) {
-  console.log('✅ MSW Demo Controls enabled!');
+  console.log('✅ MSW Cockpit enabled!');
   console.log('Click the 🎭 button in the bottom-right corner to switch scenarios.');
 
   // Display initial state
   updateStateDisplay(controls.getState());
 } else {
-  console.warn('⚠️ MSW Demo Controls not enabled.');
-  console.log('To enable, run: localStorage.setItem("MSW_DEMO_CONTROLS_ENABLED", "true")');
+  console.warn('⚠️ MSW Cockpit not enabled.');
+  console.log('To enable, run: localStorage.setItem("MSW_COCKPIT__ENABLED", "true")');
   console.log('Then reload the page.');
 }

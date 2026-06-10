@@ -1,13 +1,13 @@
-import type { MockControlsConfig, MockControlsInstance } from './core/types.js';
-import { ENABLE_FLAG_KEY } from './core/constants.js';
-import { normalizeConfig } from './core/config.js';
-import { MockController } from './core/controller.js';
-import { checkBrowserSupport, getBrowserName } from './utils/dom.js';
-import { warn, error } from './utils/logger.js';
+import type { MockControlsConfig, MockControlsInstance } from "./core/types.js";
+import { ENABLE_FLAG_KEY } from "./core/constants.js";
+import { normalizeConfig } from "./core/config.js";
+import { MockController } from "./core/controller.js";
+import { checkBrowserSupport, getBrowserName } from "./utils/dom.js";
+import { warn, error } from "./utils/logger.js";
 
 function isEnabled(): boolean {
   try {
-    return localStorage.getItem(ENABLE_FLAG_KEY) === 'true';
+    return localStorage.getItem(ENABLE_FLAG_KEY) === "true";
   } catch {
     return false;
   }
@@ -32,12 +32,14 @@ function isEnabled(): boolean {
  * });
  * ```
  */
-export function setupMswCockpit(config?: MockControlsConfig): MockControlsInstance | null {
+export function setupMswCockpit(
+  config?: MockControlsConfig,
+): MockControlsInstance | null {
   if (!isEnabled()) {
     warn(
       `Not enabled. To enable MSW Cockpit:\n\n` +
-      `  localStorage.setItem("${ENABLE_FLAG_KEY}", "true")\n\n` +
-      `Then reload the page. This flag prevents accidental production deployment.`
+        `  localStorage.setItem("${ENABLE_FLAG_KEY}", "true")\n\n` +
+        `Then reload the page. This flag prevents accidental production deployment.`,
     );
     return null;
   }
@@ -45,18 +47,23 @@ export function setupMswCockpit(config?: MockControlsConfig): MockControlsInstan
   if (!checkBrowserSupport()) {
     error(
       `Browser not supported. MSW Cockpit requires:\n` +
-      `- Chrome 90+\n` +
-      `- Firefox 88+\n` +
-      `- Safari 14+\n` +
-      `- Edge 90+\n\n` +
-      `Your browser: ${getBrowserName()}`
+        `- Chrome 90+\n` +
+        `- Firefox 88+\n` +
+        `- Safari 14+\n` +
+        `- Edge 90+\n\n` +
+        `Your browser: ${getBrowserName()}`,
     );
     return null;
   }
 
   if (config?.worker) {
-    if (typeof config.worker.use !== 'function' || typeof config.worker.resetHandlers !== 'function') {
-      error('worker must have use() and resetHandlers() methods — pass the value returned by setupWorker()');
+    if (
+      typeof config.worker.use !== "function" ||
+      typeof config.worker.resetHandlers !== "function"
+    ) {
+      error(
+        "worker must have use() and resetHandlers() methods — pass the value returned by setupWorker()",
+      );
       return null;
     }
   }
@@ -66,7 +73,7 @@ export function setupMswCockpit(config?: MockControlsConfig): MockControlsInstan
   try {
     return new MockController(normalizedConfig);
   } catch (err) {
-    error('Failed to initialize MSW Cockpit', err as Error);
+    error("Failed to initialize MSW Cockpit", err as Error);
     return null;
   }
 }

@@ -105,7 +105,7 @@ export function renderModal(
     <div class="msw-backdrop${openClass}" style="z-index: ${config.ui.zIndex};" data-backdrop>
       <div class="msw-modal" role="dialog" aria-modal="true" aria-labelledby="msw-modal-title">
         <div class="msw-modal-header">
-          <h2 id="msw-modal-title" class="msw-modal-title">MSW Demo Controls</h2>
+          <h2 id="msw-modal-title" class="msw-modal-title">MSW Cockpit</h2>
           <button class="msw-modal-close" aria-label="Close" data-close>
             ✕
           </button>

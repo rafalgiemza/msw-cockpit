@@ -116,7 +116,7 @@ export class StateManager {
       try {
         listener(state);
       } catch (error) {
-        console.error('[MSW Demo Controls] Error in onChange listener:', error);
+        console.error('[MSW Cockpit] Error in onChange listener:', error);
       }
     });
   }

@@ -1,7 +1,7 @@
 import type { NormalizedConfig } from "./types.js";
 import type { StateManager } from "./state.js";
 
-const STORAGE_KEY = "MSW_DEMO_CONTROLS_SCENARIO";
+const STORAGE_KEY = "MSW_COCKPIT__SCENARIO";
 
 /**
  * LocalStorage synchronizer for persisting state across tabs and sessions
@@ -41,7 +41,7 @@ export class LocalStorageSynchronizer {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
     } catch (error) {
-      console.error("[MSW Demo Controls] Error saving to localStorage:", error);
+      console.error("[MSW Cockpit] Error saving to localStorage:", error);
     }
   }
 
@@ -55,7 +55,7 @@ export class LocalStorageSynchronizer {
       this.state.setValuesFromStorage(values);
     } catch (error) {
       console.error(
-        "[MSW Demo Controls] Error parsing localStorage value:",
+        "[MSW Cockpit] Error parsing localStorage value:",
         error
       );
     }
@@ -73,7 +73,7 @@ export class LocalStorageSynchronizer {
       }
     } catch (error) {
       console.error(
-        "[MSW Demo Controls] Error reading from localStorage:",
+        "[MSW Cockpit] Error reading from localStorage:",
         error
       );
     }

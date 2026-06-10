@@ -2,12 +2,12 @@
 
 ## Executive Summary
 
-**Project Name:** Demo Controls
+**Project Name:** MSW Cockpit
 **Version:** 1.0  
 **Last Updated:** December 20, 2024  
 **Status:** Planning Phase
 
-Demo Controlsis an open-source developer tool that provides a UI overlay for controlling Mock Service Worker (MSW) scenarios during live demos, presentations, and client meetings. It eliminates the need to manually modify URL parameters by providing an intuitive floating control panel.
+MSW Cockpit is an open-source developer tool that provides a UI overlay for controlling Mock Service Worker (MSW) scenarios during live demos, presentations, and client meetings. It eliminates the need to manually modify URL parameters by providing an intuitive floating control panel.
 
 ## Problem Statement
 
@@ -179,7 +179,7 @@ msw-cockpit/
 
 ```javascript
 // Required to enable
-localStorage.setItem("MSW_DEMO_CONTROLS_ENABLED", "true");
+localStorage.setItem("MSW_COCKPIT__ENABLED", "true");
 ```
 
 **Acceptance Criteria:**

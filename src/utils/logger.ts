@@ -2,7 +2,7 @@
  * Console logging utilities with consistent prefix
  */
 
-const PREFIX = '[MSW Demo Controls]';
+const PREFIX = '[MSW Cockpit]';
 
 /**
  * Log a warning message

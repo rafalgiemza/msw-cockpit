@@ -19,7 +19,7 @@ const createMockConfig = (): NormalizedConfig => ({
     position: 'bottom-right',
     theme: 'light',
     trigger: {
-      label: 'MSW Demo Controls',
+      label: 'MSW Cockpit',
       icon: '🎭',
     },
     zIndex: 999999,

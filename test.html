@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MSW Demo Controls - Manual Test</title>
+  <title>MSW Cockpit - Manual Test</title>
   <style>
     :root {
       --bg-gradient-start: #667eea;
@@ -201,7 +201,7 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>🎭 MSW Demo Controls - Manual Test Page</h1>
+      <h1>🎭 MSW Cockpit - Manual Test Page</h1>
       <div class="theme-toggle">
         <span id="theme-label" style="color: var(--text-secondary); font-size: 14px;">Light</span>
         <div class="toggle-switch" id="theme-toggle" onclick="toggleTheme()">
@@ -218,7 +218,7 @@
       <h3>✅ Manual Testing Checklist</h3>
       <ol>
         <li><strong>Enable the controls:</strong> Click the button below or run in console:
-          <div class="code">localStorage.setItem("MSW_DEMO_CONTROLS_ENABLED", "true")</div>
+          <div class="code">localStorage.setItem("MSW_COCKPIT__ENABLED", "true")</div>
           <button onclick="enableControls()">Enable Controls</button>
         </li>
         <li><strong>Check for trigger button:</strong> Look for a floating 🎭 button in the bottom-right corner</li>
@@ -379,7 +379,7 @@
     }
 
     window.enableControls = function() {
-      localStorage.setItem('MSW_DEMO_CONTROLS_ENABLED', 'true');
+      localStorage.setItem('MSW_COCKPIT__ENABLED', 'true');
       location.reload();
     };
 

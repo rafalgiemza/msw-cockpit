@@ -78,7 +78,7 @@ export type StateListener = (state: ScenarioState) => void;
 export type Unsubscribe = () => void;
 
 /**
- * Main configuration for MSW Demo Controls
+ * Main configuration for MSW Cockpit
  * Supports both simple array and rich scenario definitions
  */
 export interface MockControlsConfig {
