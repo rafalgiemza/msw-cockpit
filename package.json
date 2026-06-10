@@ -37,6 +37,25 @@
   ],
   "author": "Rafał Giemza",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rafalgiemza/msw-cockpit.git"
+  },
+  "homepage": "https://github.com/rafalgiemza/msw-cockpit#readme",
+  "bugs": {
+    "url": "https://github.com/rafalgiemza/msw-cockpit/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "peerDependencies": {
+    "msw": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "msw": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^11.0.0",
     "@types/node": "^20.0.0",
