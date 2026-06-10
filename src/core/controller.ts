@@ -21,7 +21,7 @@ export class MockController implements MockControlsInstance {
   private storageSync: LocalStorageSynchronizer;
   private uiManager: UIManager;
   private config: NormalizedConfig;
-  private worker?: MswWorker;
+  private worker: MswWorker;
 
   constructor(config: NormalizedConfig) {
     this.config = config;
@@ -39,7 +39,7 @@ export class MockController implements MockControlsInstance {
     this.uiManager = new UIManager(
       this.stateManager,
       config,
-      this.applyScenario.bind(this)
+      this.applyScenario.bind(this),
     );
 
     // Call user's onChange if provided
@@ -58,8 +58,8 @@ export class MockController implements MockControlsInstance {
 
   private applyWorkerHandlers(dimensionId: string, scenarioId: string): void {
     if (!this.worker) return;
-    const dimension = this.config.dimensions.find(d => d.id === dimensionId);
-    const scenario = dimension?.scenarios.find(s => s.id === scenarioId);
+    const dimension = this.config.dimensions.find((d) => d.id === dimensionId);
+    const scenario = dimension?.scenarios.find((s) => s.id === scenarioId);
     if (scenario?.handlers?.length) {
       this.worker.use(...scenario.handlers);
     } else {

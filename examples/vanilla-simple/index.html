@@ -98,9 +98,10 @@
 
     <h2>Configuration Used</h2>
     <pre>
-import { enableMockControls } from 'msw-cockpit';
+import { setupMswCockpit } from 'msw-cockpit';
 
-enableMockControls({
+setupMswCockpit({
+  worker,
   scenarios: ['default', 'error', 'loading'],
   onChange: (state) => {
     console.log('Scenario changed:', state);

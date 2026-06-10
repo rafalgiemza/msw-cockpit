@@ -230,9 +230,9 @@ const worker = setupWorker(...defaultHandlers);
 setupMswCockpit({
   worker,
   scenarios: [
-    { id: "default", label: "Default",    handlers: [defaultHandler] },
-    { id: "error",   label: "API Error",  handlers: [errorHandler], icon: "❌" },
-    { id: "empty",   label: "Empty List", handlers: [emptyHandler] },
+    { id: "default", label: "Default", handlers: [defaultHandler] },
+    { id: "error", label: "API Error", handlers: [errorHandler], icon: "❌" },
+    { id: "empty", label: "Empty List", handlers: [emptyHandler] },
   ],
 });
 ```
@@ -321,8 +321,8 @@ const worker = setupWorker(...defaultHandlers);
 setupMswCockpit({
   worker,
   scenarios: [
-    { id: 'default', label: 'Default', handlers: [defaultHandler] },
-    { id: 'error',   label: 'Error',   handlers: [errorHandler] },
+    { id: "default", label: "Default", handlers: [defaultHandler] },
+    { id: "error", label: "Error", handlers: [errorHandler] },
   ],
 });
 ```
@@ -464,7 +464,7 @@ const { state, applyScenario, applyPreset } = useMockControls({
 
 ```typescript
 function setupMswCockpit(
-  config?: MockControlsConfig
+  config?: MockControlsConfig,
 ): MockControlsInstance | null;
 
 interface MswWorker {
@@ -474,7 +474,7 @@ interface MswWorker {
 
 interface MockControlsConfig {
   // Hot-swap worker (optional — URL-only mode if omitted)
-  worker?: MswWorker;
+  worker: MswWorker;
 
   // Simple mode
   scenarios?: Array<string | ScenarioDefinition>;
@@ -643,7 +643,6 @@ function useMockControls(config: MockControlsConfig): {
 ### README.md Structure
 
 1. **Hero Section**
-
    - Project logo/badge
    - One-line description
    - Key features (3-5 bullets)
@@ -651,18 +650,15 @@ function useMockControls(config: MockControlsConfig): {
    - Demo GIF/video
 
 2. **Quick Start**
-
    - Enable localStorage flag
    - Basic example (5 lines)
    - Link to live demo
 
 3. **Installation**
-
    - npm, yarn, pnpm commands
    - CDN option (future)
 
 4. **Usage Examples**
-
    - Simple scenario array
    - Rich scenarios with descriptions
    - Multi-dimension control
@@ -671,33 +667,28 @@ function useMockControls(config: MockControlsConfig): {
    - React hook
 
 5. **API Reference**
-
    - Configuration options table
    - TypeScript types
    - Return value documentation
 
 6. **Advanced Usage**
-
    - Custom URL handling
    - Persistence configuration
    - Conditional scenarios
    - Theming
 
 7. **Best Practices**
-
    - When to use presets vs dimensions
    - Naming conventions for scenarios
    - Demo workflow tips
 
 8. **FAQ**
-
    - Why localStorage flag?
    - Browser compatibility
    - Bundle size impact
    - MSW integration patterns
 
 9. **Contributing**
-
    - Link to CONTRIBUTING.md
    - Development setup
    - Testing approach

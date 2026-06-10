@@ -8,10 +8,10 @@
 
 ## ✨ Features
 
-- 🎯 **Zero Configuration** - Auto-detects scenarios from URL parameters
+- 🔄 **Hot-swap** - Instantly switches MSW handlers without page reload
 - 🎨 **Beautiful UI** - Floating control panel with smooth animations
 - 🔒 **Production Safe** - Requires localStorage flag to prevent accidental deployment
-- 📦 **Lightweight** - Only 3.88 KB gzipped
+- 📦 **Lightweight** - Only 5 KB gzipped
 - 🌐 **Framework Agnostic** - Works with any JavaScript framework
 - ⌨️ **Accessible** - Full keyboard navigation and screen reader support
 - 🎭 **Shadow DOM** - Completely isolated from your app's styles
@@ -45,12 +45,26 @@ Then reload the page.
 ### 2. Initialize in Your App
 
 ```javascript
-import { enableMockControls } from 'msw-cockpit';
+import { setupWorker } from "msw/browser";
+import { setupMswCockpit } from "msw-cockpit";
 
-// Simple array of scenarios
-enableMockControls({
-  scenarios: ['default', 'error', 'loading']
+const worker = setupWorker(...defaultHandlers);
+
+setupMswCockpit({
+  worker,
+  scenarios: [
+    { id: "default", label: "Default", handlers: [defaultHandler] },
+    { id: "error", label: "Error State", handlers: [errorHandler], icon: "❌" },
+    {
+      id: "loading",
+      label: "Slow Loading",
+      handlers: [loadingHandler],
+      icon: "⏳",
+    },
+  ],
 });
+
+await worker.start();
 ```
 
 ### 3. Use the Controls
@@ -59,112 +73,116 @@ Look for the floating 🎭 button in the bottom-right corner of your page. Click
 
 ## 📖 Usage Examples
 
-### Zero Configuration (Auto-detect)
-
-```javascript
-import { enableMockControls } from 'msw-cockpit';
-
-// Automatically detects scenario from URL (?scenario=error, ?mock=loading, etc.)
-enableMockControls();
-```
-
 ### Simple String Array
 
+When scenario IDs match your MSW handler file names, a string array is the shortest form. Selecting a scenario still hot-swaps the matching `handlers` if you add them later.
+
 ```javascript
-enableMockControls({
-  scenarios: ['default', 'error', 'loading', 'empty']
+setupMswCockpit({
+  worker,
+  scenarios: ["default", "error", "loading", "empty"],
 });
 ```
 
 ### Rich Scenarios with Icons and Descriptions
 
 ```javascript
-enableMockControls({
+setupMswCockpit({
+  worker,
   scenarios: [
     {
-      id: 'default',
-      label: 'Default State',
-      icon: '✅',
-      description: 'Normal API responses'
+      id: "default",
+      label: "Default State",
+      icon: "✅",
+      description: "Normal API responses",
+      handlers: [defaultHandler],
     },
     {
-      id: 'error',
-      label: 'Error State',
-      icon: '❌',
-      description: 'Simulates 500 server error'
+      id: "error",
+      label: "Error State",
+      icon: "❌",
+      description: "Simulates 500 server error",
+      handlers: [errorHandler],
     },
     {
-      id: 'loading',
-      label: 'Slow Loading',
-      icon: '⏳',
-      description: 'Delayed responses (3s)'
+      id: "loading",
+      label: "Slow Loading",
+      icon: "⏳",
+      description: "Delayed responses (3s)",
+      handlers: [loadingHandler],
     },
     {
-      id: 'empty',
-      label: 'Empty State',
-      icon: '📭',
-      description: 'No data returned'
-    }
-  ]
+      id: "empty",
+      label: "Empty State",
+      icon: "📭",
+      description: "No data returned",
+      handlers: [emptyHandler],
+    },
+  ],
 });
 ```
 
 ### With onChange Callback
 
 ```javascript
-enableMockControls({
-  scenarios: ['default', 'error', 'loading'],
+setupMswCockpit({
+  worker,
+  scenarios: ["default", "error", "loading"],
   onChange: (state) => {
-    console.log('Scenario changed:', state);
+    console.log("Scenario changed:", state);
     // { values: { scenario: 'error' }, url: 'http://...' }
-  }
+  },
 });
 ```
 
 ### Custom URL Parameter Name
 
 ```javascript
-enableMockControls({
-  scenarios: ['default', 'error'],
-  paramName: 'mock' // Uses ?mock=error instead of ?scenario=error
+setupMswCockpit({
+  worker,
+  scenarios: ["default", "error"],
+  paramName: "mock", // Uses ?mock=error instead of ?scenario=error
 });
 ```
 
 ### Custom Button Position
 
 ```javascript
-enableMockControls({
-  scenarios: ['default', 'error'],
+setupMswCockpit({
+  worker,
+  scenarios: ["default", "error"],
   ui: {
-    position: 'top-left' // Options: 'top-left', 'top-right', 'bottom-left', 'bottom-right'
-  }
+    position: "top-left", // Options: 'top-left', 'top-right', 'bottom-left', 'bottom-right'
+  },
 });
 ```
 
 ### Custom Trigger Icon
 
 ```javascript
-enableMockControls({
-  scenarios: ['default', 'error'],
+setupMswCockpit({
+  worker,
+  scenarios: ["default", "error"],
   ui: {
     trigger: {
-      icon: '🎬',
-      label: 'Demo Controls'
-    }
-  }
+      icon: "🎬",
+      label: "Demo Controls",
+    },
+  },
 });
 ```
 
 ### Programmatic Control
 
 ```javascript
-const controls = enableMockControls({
-  scenarios: ['default', 'error', 'loading']
+const controls = setupMswCockpit({
+  worker,
+  scenarios: ["default", "error", "loading"],
 });
 
 if (controls) {
   // Apply a scenario programmatically
-  controls.applyScenario('scenario', 'error');
+  controls.applyScenario("scenario", "error");
 
   // Get current state
   const state = controls.getState();
@@ -172,7 +190,7 @@ if (controls) {
 
   // Subscribe to changes
   const unsubscribe = controls.onChange((state) => {
-    console.log('Changed:', state);
+    console.log("Changed:", state);
   });
 
   // Cleanup when done
@@ -183,38 +201,40 @@ if (controls) {
 
 ## 🔧 API Reference
 
-### `enableMockControls(config?: MockControlsConfig): MockControlsInstance | null`
+### `setupMswCockpit(config: MockControlsConfig): MockControlsInstance | null`
 
 Main function to enable the controls. Returns `null` if not enabled or browser not supported.
 
 #### Configuration Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `scenarios` | `Array<string \| ScenarioDefinition>` | `[]` | Array of scenario IDs or rich scenario objects |
-| `paramName` | `string` | `'scenario'` | URL parameter name |
-| `urlStrategy` | `'replace' \| 'push'` | `'replace'` | How to update the URL (`replace` doesn't add history entries) |
-| `onChange` | `(state: ScenarioState) => void` | `undefined` | Callback fired when scenario changes |
-| `ui` | `UIConfig` | See below | UI customization options |
+| Option        | Type                                  | Default      | Description                                                   |
+| ------------- | ------------------------------------- | ------------ | ------------------------------------------------------------- |
+| `worker`      | `MswWorker`                           | **required** | MSW worker returned by `setupWorker()`                        |
+| `scenarios`   | `Array<string \| ScenarioDefinition>` | `[]`         | Array of scenario IDs or rich scenario objects                |
+| `paramName`   | `string`                              | `'scenario'` | URL parameter name                                            |
+| `urlStrategy` | `'replace' \| 'push'`                 | `'replace'`  | How to update the URL (`replace` doesn't add history entries) |
+| `onChange`    | `(state: ScenarioState) => void`      | `undefined`  | Callback fired when scenario changes                          |
+| `ui`          | `UIConfig`                            | See below    | UI customization options                                      |
 
 #### UI Configuration
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `ui.position` | `Position` | `'bottom-right'` | Button position (`'top-left'`, `'top-right'`, `'bottom-left'`, `'bottom-right'`) |
-| `ui.theme` | `Theme` | `'light'` | UI theme (`'light'` or `'dark'`) |
-| `ui.trigger.icon` | `string` | `'🎭'` | Custom icon for trigger button |
-| `ui.trigger.label` | `string` | `'MSW Cockpit'` | Accessibility label |
-| `ui.zIndex` | `number` | `999999` | Z-index for the controls |
+| Option             | Type       | Default          | Description                                                                      |
+| ------------------ | ---------- | ---------------- | -------------------------------------------------------------------------------- |
+| `ui.position`      | `Position` | `'bottom-right'` | Button position (`'top-left'`, `'top-right'`, `'bottom-left'`, `'bottom-right'`) |
+| `ui.theme`         | `Theme`    | `'light'`        | UI theme (`'light'` or `'dark'`)                                                 |
+| `ui.trigger.icon`  | `string`   | `'🎭'`           | Custom icon for trigger button                                                   |
+| `ui.trigger.label` | `string`   | `'MSW Cockpit'`  | Accessibility label                                                              |
+| `ui.zIndex`        | `number`   | `999999`         | Z-index for the controls                                                         |
 
 #### ScenarioDefinition
 
 ```typescript
 interface ScenarioDefinition {
-  id: string;              // Unique identifier
-  label: string;           // Display label
-  description?: string;    // Optional description
-  icon?: string;           // Optional icon/emoji
+  id: string; // Unique identifier
+  label: string; // Display label
+  description?: string; // Optional description
+  icon?: string; // Optional icon/emoji
+  handlers?: any[]; // MSW RequestHandlers applied via worker.use()
 }
 ```
 
@@ -231,11 +251,12 @@ interface MockControlsInstance {
 
 ## 🎯 How It Works
 
-1. **URL Synchronization**: Scenarios are synced to URL parameters in real-time
-2. **Browser Navigation**: Back/forward buttons work as expected
-3. **State Management**: Internal state management with observer pattern
-4. **Shadow DOM**: UI is completely isolated from your app's styles
-5. **Accessibility**: Full keyboard navigation and ARIA labels
+1. **Hot-swap**: Selecting a scenario calls `worker.use(...scenario.handlers)` to override MSW handlers instantly
+2. **URL Synchronization**: Active scenario is synced to URL parameters for bookmarkable state
+3. **Browser Navigation**: Back/forward buttons work as expected
+4. **State Management**: Internal state management with observer pattern
+5. **Shadow DOM**: UI is completely isolated from your app's styles
+6. **Accessibility**: Full keyboard navigation and ARIA labels
 
 ## 🔒 Production Safety
 
@@ -261,13 +282,14 @@ The library uses modern browser features (Shadow DOM, URL API) and will show a c
 Full TypeScript definitions are included:
 
 ```typescript
-import { enableMockControls, type MockControlsConfig } from 'msw-cockpit';
+import { setupMswCockpit, type MockControlsConfig } from "msw-cockpit";
 
 const config: MockControlsConfig = {
-  scenarios: ['default', 'error']
+  worker,
+  scenarios: ["default", "error"],
 };
 
-enableMockControls(config);
+setupMswCockpit(config);
 ```
 
 ## 🎬 Example
@@ -313,6 +335,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 💡 Use Cases
 
 Perfect for:
+
 - **Sales Demos**: Quickly switch between different scenarios during client presentations
 - **Developer Advocates**: Demonstrate error handling and edge cases at conferences
 - **Solutions Architects**: Show various system states without code changes

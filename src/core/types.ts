@@ -10,17 +10,21 @@ export interface MswWorker {
 /**
  * Position of the floating trigger button
  */
-export type Position = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+export type Position =
+  | "top-left"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-right";
 
 /**
  * Theme mode for the UI
  */
-export type Theme = 'light' | 'dark';
+export type Theme = "light" | "dark";
 
 /**
  * URL update strategy
  */
-export type URLStrategy = 'replace' | 'push';
+export type URLStrategy = "replace" | "push";
 
 /**
  * Scenario definition with optional metadata
@@ -86,7 +90,7 @@ export interface MockControlsConfig {
    * MSW worker instance for hot-swapping handlers on scenario change.
    * Must expose use() and resetHandlers() — pass the value returned by setupWorker().
    */
-  worker?: MswWorker;
+  worker: MswWorker;
 
   /**
    * Simple array of scenario IDs or rich scenario definitions
@@ -151,7 +155,7 @@ export interface NormalizedConfig {
   dimensions: NormalizedDimension[];
   urlStrategy: URLStrategy;
   onChange?: StateListener;
-  worker?: MswWorker;
+  worker: MswWorker;
   ui: {
     position: Position;
     theme: Theme;
