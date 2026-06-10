@@ -1,5 +1,5 @@
 {
-  "name": "msw-demo-controls",
+  "name": "msw-cockpit",
   "version": "0.1.0",
   "description": "UI overlay for controlling MSW scenarios during live demos",
   "type": "module",

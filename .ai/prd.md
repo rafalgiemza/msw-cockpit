@@ -143,7 +143,7 @@ So that I understand what each option does without asking
 **Package Structure:**
 
 ```
-msw-demo-controls/
+msw-cockpit/
 ├── src/
 │   ├── core/           # State management, URL handling
 │   ├── ui/             # DOM manipulation, rendering
@@ -323,7 +323,7 @@ onChange: (state: ScenarioState) => {
 **Component API:**
 
 ```tsx
-import { MockControls } from 'msw-demo-controls/react';
+import { MockControls } from 'msw-cockpit/react';
 
 <MockControls
   scenarios={[...]}
@@ -335,7 +335,7 @@ import { MockControls } from 'msw-demo-controls/react';
 **Hook API:**
 
 ```tsx
-import { useMockControls } from 'msw-demo-controls/react';
+import { useMockControls } from 'msw-cockpit/react';
 
 const { state, applyScenario, applyPreset } = useMockControls({
   scenarios: [...]

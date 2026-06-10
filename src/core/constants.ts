@@ -39,7 +39,7 @@ export const DEFAULT_Z_INDEX = 999999;
 /**
  * Container ID for the Shadow DOM host element
  */
-export const CONTAINER_ID = 'msw-demo-controls-container';
+export const CONTAINER_ID = 'msw-cockpit-container';
 
 /**
  * Default dimension ID for simple mode

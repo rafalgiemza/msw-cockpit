@@ -2,8 +2,8 @@
 
 > UI overlay for controlling Mock Service Worker (MSW) scenarios during live demos and presentations
 
-[![npm version](https://img.shields.io/npm/v/msw-demo-controls)](https://www.npmjs.com/package/msw-demo-controls)
-[![Bundle size](https://img.shields.io/bundlephobia/minzip/msw-demo-controls)](https://bundlephobia.com/package/msw-demo-controls)
+[![npm version](https://img.shields.io/npm/v/msw-cockpit)](https://www.npmjs.com/package/msw-cockpit)
+[![Bundle size](https://img.shields.io/bundlephobia/minzip/msw-cockpit)](https://bundlephobia.com/package/msw-cockpit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## ✨ Features
@@ -19,15 +19,15 @@
 ## 📦 Installation
 
 ```bash
-npm install msw-demo-controls
+npm install msw-cockpit
 ```
 
 ```bash
-yarn add msw-demo-controls
+yarn add msw-cockpit
 ```
 
 ```bash
-pnpm add msw-demo-controls
+pnpm add msw-cockpit
 ```
 
 ## 🚀 Quick Start
@@ -45,7 +45,7 @@ Then reload the page.
 ### 2. Initialize in Your App
 
 ```javascript
-import { enableMockControls } from 'msw-demo-controls';
+import { enableMockControls } from 'msw-cockpit';
 
 // Simple array of scenarios
 enableMockControls({
@@ -62,7 +62,7 @@ Look for the floating 🎭 button in the bottom-right corner of your page. Click
 ### Zero Configuration (Auto-detect)
 
 ```javascript
-import { enableMockControls } from 'msw-demo-controls';
+import { enableMockControls } from 'msw-cockpit';
 
 // Automatically detects scenario from URL (?scenario=error, ?mock=loading, etc.)
 enableMockControls();
@@ -261,7 +261,7 @@ The library uses modern browser features (Shadow DOM, URL API) and will show a c
 Full TypeScript definitions are included:
 
 ```typescript
-import { enableMockControls, type MockControlsConfig } from 'msw-demo-controls';
+import { enableMockControls, type MockControlsConfig } from 'msw-cockpit';
 
 const config: MockControlsConfig = {
   scenarios: ['default', 'error']
