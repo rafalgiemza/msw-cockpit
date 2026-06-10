@@ -1,4 +1,13 @@
 /**
+ * Minimal MSW worker interface required for hot-swap
+ * Compatible with MSW's SetupWorker without importing from MSW
+ */
+export interface MswWorker {
+  use: (...handlers: any[]) => void;
+  resetHandlers: (...handlers: any[]) => void;
+}
+
+/**
  * Position of the floating trigger button
  */
 export type Position = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -25,6 +34,8 @@ export interface ScenarioDefinition {
   description?: string;
   /** Optional icon/emoji to display */
   icon?: string;
+  /** MSW RequestHandler[] applied via worker.use() when this scenario is selected */
+  handlers?: any[];
 }
 
 /**
@@ -72,6 +83,12 @@ export type Unsubscribe = () => void;
  */
 export interface MockControlsConfig {
   /**
+   * MSW worker instance for hot-swapping handlers on scenario change.
+   * Must expose use() and resetHandlers() — pass the value returned by setupWorker().
+   */
+  worker?: MswWorker;
+
+  /**
    * Simple array of scenario IDs or rich scenario definitions
    * Examples:
    * - ['default', 'error', 'loading']
@@ -111,6 +128,7 @@ export interface NormalizedScenario {
   label: string;
   description?: string;
   icon?: string;
+  handlers?: any[];
 }
 
 /**
@@ -133,6 +151,7 @@ export interface NormalizedConfig {
   dimensions: NormalizedDimension[];
   urlStrategy: URLStrategy;
   onChange?: StateListener;
+  worker?: MswWorker;
   ui: {
     position: Position;
     theme: Theme;

@@ -1,6 +1,7 @@
 import type {
   NormalizedConfig,
   MockControlsInstance,
+  MswWorker,
   ScenarioState,
   StateListener,
   Unsubscribe,
@@ -19,8 +20,12 @@ export class MockController implements MockControlsInstance {
   private urlSync: URLSynchronizer;
   private storageSync: LocalStorageSynchronizer;
   private uiManager: UIManager;
+  private config: NormalizedConfig;
+  private worker?: MswWorker;
 
   constructor(config: NormalizedConfig) {
+    this.config = config;
+    this.worker = config.worker;
     // Create state manager
     this.stateManager = new StateManager(config);
 
@@ -48,6 +53,18 @@ export class MockController implements MockControlsInstance {
    */
   applyScenario(dimensionId: string, scenarioId: string): void {
     this.stateManager.applyScenario(dimensionId, scenarioId);
+    this.applyWorkerHandlers(dimensionId, scenarioId);
+  }
+
+  private applyWorkerHandlers(dimensionId: string, scenarioId: string): void {
+    if (!this.worker) return;
+    const dimension = this.config.dimensions.find(d => d.id === dimensionId);
+    const scenario = dimension?.scenarios.find(s => s.id === scenarioId);
+    if (scenario?.handlers?.length) {
+      this.worker.use(...scenario.handlers);
+    } else {
+      this.worker.resetHandlers();
+    }
   }
 
   /**

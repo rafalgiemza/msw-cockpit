@@ -33,6 +33,7 @@ function normalizeScenario(scenario: string | ScenarioDefinition): NormalizedSce
     label: scenario.label,
     description: scenario.description,
     icon: scenario.icon,
+    handlers: scenario.handlers,
   };
 }
 
@@ -81,6 +82,7 @@ export function normalizeConfig(config?: MockControlsConfig): NormalizedConfig {
       dimensions: [dimension],
       urlStrategy: config?.urlStrategy || 'replace',
       onChange: config?.onChange,
+      worker: config?.worker,
       ui: {
         position: config?.ui?.position || DEFAULT_POSITION,
         theme: config?.ui?.theme || DEFAULT_THEME,
@@ -108,6 +110,7 @@ export function normalizeConfig(config?: MockControlsConfig): NormalizedConfig {
     dimensions: [dimension],
     urlStrategy: config.urlStrategy || 'replace',
     onChange: config.onChange,
+    worker: config.worker,
     ui: {
       position: config.ui?.position || DEFAULT_POSITION,
       theme: config.ui?.theme || DEFAULT_THEME,

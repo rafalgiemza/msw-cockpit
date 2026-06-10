@@ -69,6 +69,15 @@ I want to click a floating button and select a scenario
 So that I can switch mock states without touching the URL
 ```
 
+**US-2b: Hot-swap MSW Handlers**
+
+```
+As a developer using MSW
+I want to pass my worker instance to setupMswCockpit
+So that selecting a scenario immediately replaces active handlers via worker.use()
+without requiring a page reload or URL round-trip
+```
+
 **US-3: Preset Combinations**
 
 ```
@@ -156,7 +165,7 @@ msw-cockpit/
 
 **Build System:**
 
-- tsup for bundling (ESM + CJS)
+- tsdown for bundling (ESM + CJS)
 - TypeScript for type definitions
 - Dual exports: core + react subpath
 
@@ -186,14 +195,14 @@ localStorage.setItem("MSW_DEMO_CONTROLS_ENABLED", "true");
 **Level 1 - Zero Config (Auto-detection):**
 
 ```typescript
-enableMockControls();
+setupMswCockpit();
 // Scans for common URL params: scenario, mock, state
 ```
 
 **Level 2 - Simple Array:**
 
 ```typescript
-enableMockControls({
+setupMswCockpit({
   scenarios: ["default", "empty", "error", "loading"],
 });
 ```
@@ -201,7 +210,7 @@ enableMockControls({
 **Level 3 - Rich Scenarios:**
 
 ```typescript
-enableMockControls({
+setupMswCockpit({
   scenarios: [
     {
       id: "error",
@@ -213,10 +222,27 @@ enableMockControls({
 });
 ```
 
-**Level 4 - Multi-Dimension:**
+**Level 4 - With Hot-swap Worker:**
 
 ```typescript
-enableMockControls({
+const worker = setupWorker(...defaultHandlers);
+
+setupMswCockpit({
+  worker,
+  scenarios: [
+    { id: "default", label: "Default",    handlers: [defaultHandler] },
+    { id: "error",   label: "API Error",  handlers: [errorHandler], icon: "❌" },
+    { id: "empty",   label: "Empty List", handlers: [emptyHandler] },
+  ],
+});
+```
+
+When `worker` is provided, selecting a scenario immediately calls `worker.use(...scenario.handlers)`. Scenarios without `handlers` call `worker.resetHandlers()` to restore defaults. URL sync still runs alongside for bookmarkable state.
+
+**Level 5 - Multi-Dimension:**
+
+```typescript
+setupMswCockpit({
   dimensions: [
     {
       id: 'user',
@@ -234,10 +260,10 @@ enableMockControls({
 });
 ```
 
-**Level 5 - Presets:**
+**Level 6 - Presets:**
 
 ```typescript
-enableMockControls({
+setupMswCockpit({
   dimensions: [...],
   presets: [
     {
@@ -283,7 +309,49 @@ enableMockControls({
 - Shows icon, label, and description
 - One-click to apply multiple scenarios
 
-#### Feature 4: State Management
+#### Feature 4: Hot-swap Worker Integration
+
+**Requirement:** When a worker is provided, selecting a scenario must immediately replace active MSW handlers without a page reload.
+
+**Implementation:**
+
+```typescript
+const worker = setupWorker(...defaultHandlers);
+
+setupMswCockpit({
+  worker,
+  scenarios: [
+    { id: 'default', label: 'Default', handlers: [defaultHandler] },
+    { id: 'error',   label: 'Error',   handlers: [errorHandler] },
+  ],
+});
+```
+
+**Behavior:**
+
+- `worker` is optional — omitting it keeps the existing URL-only mode
+- On scenario selection: if `handlers` is a non-empty array, calls `worker.use(...handlers)`
+- On scenario selection: if `handlers` is absent or empty, calls `worker.resetHandlers()` to restore original handlers
+- URL sync still runs alongside for bookmarkable/shareable state
+- At init, `worker` is validated: must expose `use()` and `resetHandlers()` — returns `null` with a console error if not
+
+**Worker type (no MSW peer dependency required):**
+
+```typescript
+interface MswWorker {
+  use: (...handlers: any[]) => void;
+  resetHandlers: (...handlers: any[]) => void;
+}
+```
+
+**Acceptance Criteria:**
+
+- Selecting a scenario with `handlers` calls `worker.use(...handlers)` synchronously
+- Selecting a scenario without `handlers` calls `worker.resetHandlers()`
+- Passing an object without `use`/`resetHandlers` logs an error and returns `null`
+- Omitting `worker` entirely preserves URL-only behavior unchanged
+
+#### Feature 5: State Management
 
 **URL Synchronization:**
 
@@ -318,7 +386,7 @@ onChange: (state: ScenarioState) => {
 - Provides current state object
 - Useful for analytics, logging, debugging
 
-#### Feature 5: React Integration
+#### Feature 6: React Integration
 
 **Component API:**
 
@@ -395,11 +463,19 @@ const { state, applyScenario, applyPreset } = useMockControls({
 ### Core API
 
 ```typescript
-function enableMockControls(
+function setupMswCockpit(
   config?: MockControlsConfig
 ): MockControlsInstance | null;
 
+interface MswWorker {
+  use: (...handlers: any[]) => void;
+  resetHandlers: (...handlers: any[]) => void;
+}
+
 interface MockControlsConfig {
+  // Hot-swap worker (optional — URL-only mode if omitted)
+  worker?: MswWorker;
+
   // Simple mode
   scenarios?: Array<string | ScenarioDefinition>;
   paramName?: string;
@@ -426,6 +502,7 @@ interface ScenarioDefinition {
   icon?: string;
   badge?: string;
   visible?: () => boolean;
+  handlers?: any[]; // MSW RequestHandler[] — applied via worker.use() on selection
 }
 
 interface DimensionDefinition {
@@ -837,9 +914,10 @@ function useMockControls(config: MockControlsConfig): {
 ### Version History
 
 - v1.0 (2024-12-20): Initial PRD based on project planning discussion
+- v1.1 (2026-06-10): Added hot-swap worker integration (Feature 4); renamed entry point to `setupMswCockpit`; added `MswWorker` interface and `handlers` field on `ScenarioDefinition`; renumbered features 4→5 (State Management) and 4→6 (React Integration)
 
 ---
 
 **Document Owner**: Open Source Maintainer  
-**Last Reviewed**: December 20, 2024  
+**Last Reviewed**: June 10, 2026  
 **Next Review**: Post-MVP feedback (Week 4)

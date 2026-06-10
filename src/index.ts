@@ -1,12 +1,13 @@
 /**
- * MSW Demo Controls
+ * MSW Cockpit
  * UI overlay for controlling MSW scenarios during live demos
  */
 
-export { enableMockControls } from './enable.js';
+export { setupMswCockpit } from './enable.js';
 
 // Export types for TypeScript users
 export type {
+  MswWorker,
   Position,
   Theme,
   URLStrategy,
