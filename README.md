@@ -292,7 +292,7 @@ const config: MockControlsConfig = {
 setupMswCockpit(config);
 ```
 
-## Example 🎬
+## 🎬 Example
 
 See the [examples/vanilla-simple](./examples/vanilla-simple) directory for a complete working example.
 
