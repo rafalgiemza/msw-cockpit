@@ -327,16 +327,10 @@ setupMswCockpit(config);
 
 ## 🎬 Example
 
-See the [examples/vanilla-simple](./examples/vanilla-simple) directory for a complete working example.
+- [react-vite](./examples/react-vite) - React + Vite + MSW: handlers, `?scenario=` states and per-handler toggles (the setup from the API-First article)
+- [vanilla-simple](./examples/vanilla-simple) - plain JS, scenarios only, no MSW
 
-To run the example:
-
-```bash
-cd examples/vanilla-simple
-npx serve .
-```
-
-Then visit `http://localhost:3000`, enable the controls in the console, and reload.
+To run them, build the library first (`npm install && npm run build`). Run `npm install && npm run dev` in `react-vite` (see its README) or `npx serve .` in `vanilla-simple`.
 
 ## 🛠️ Development
 
