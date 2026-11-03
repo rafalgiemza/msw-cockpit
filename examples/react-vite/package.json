@@ -1,0 +1,23 @@
+{
+  "name": "msw-cockpit-example-react-vite",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "msw": "^2.4.0",
+    "msw-cockpit": "file:../..",
+    "vite": "^5.4.0"
+  },
+  "msw": {
+    "workerDirectory": "public"
+  }
+}
