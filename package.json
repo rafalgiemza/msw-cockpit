@@ -1,6 +1,6 @@
 {
   "name": "msw-cockpit",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "UI overlay for controlling MSW scenarios during live demos",
   "type": "module",
   "main": "./dist/index.js",
@@ -65,6 +65,7 @@
     "@vitest/ui": "^1.0.0",
     "eslint": "^8.0.0",
     "jsdom": "^23.0.0",
+    "msw": "^2.15.0",
     "size-limit": "^11.0.0",
     "tsdown": "^0.18.2",
     "typescript": "^5.3.0",

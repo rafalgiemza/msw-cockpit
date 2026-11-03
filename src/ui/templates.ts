@@ -1,5 +1,10 @@
 import type { NormalizedConfig, NormalizedDimension, NormalizedScenario } from '../core/types.js';
-import type { Position } from '../core/types.js';
+import type { Position, HandlerInfo } from '../core/types.js';
+
+export interface HandlerPanel {
+  handlers: HandlerInfo[];
+  onToggle: (handlerId: string) => void;
+}
 
 /**
  * Get position styles for trigger button
@@ -92,12 +97,74 @@ function renderScenarioList(dimension: NormalizedDimension, activeId: string | n
 }
 
 /**
+ * Render the per-handler on/off list
+ */
+export function renderHandlerList(handlers: HandlerInfo[], disabledIds: string[]): string {
+  if (handlers.length === 0) return '';
+  const disabled = new Set(disabledIds);
+
+  return `
+    <div class="msw-dimension">
+      <h3 class="msw-dimension-label">Handlers</h3>
+      <div class="msw-handler-list">
+        ${handlers.map(handler => {
+          const on = !disabled.has(handler.id);
+          return `
+            <button
+              class="msw-handler${on ? '' : ' msw-handler--off'}"
+              role="switch"
+              aria-checked="${on}"
+              data-handler-id="${escapeHTML(handler.id)}"
+              title="${on ? 'Mocked — click to use the real network' : 'Real network — click to mock'}"
+            >
+              ${handler.method ? `<span class="msw-handler-method">${escapeHTML(handler.method)}</span>` : ''}
+              <span class="msw-handler-path">${escapeHTML(handler.path)}</span>
+              <span class="msw-handler-switch"><span class="msw-handler-knob"></span></span>
+            </button>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Scenario dimensions worth rendering: drop the "no scenarios" placeholder
+ * when the handler list is the main content
+ */
+export function visibleDimensions(config: NormalizedConfig, hasHandlers: boolean): NormalizedDimension[] {
+  return hasHandlers ? config.dimensions.filter(d => d.scenarios.length > 0) : config.dimensions;
+}
+
+/**
+ * Render the MSW on/off toggle pill
+ */
+function renderMswToggle(mswEnabled: boolean): string {
+  const onOff = mswEnabled ? 'ON' : 'OFF';
+  return `
+    <button
+      class="msw-toggle ${mswEnabled ? 'msw-toggle--on' : 'msw-toggle--off'}"
+      data-msw-toggle
+      aria-label="${mswEnabled ? 'Disable MSW' : 'Enable MSW'}"
+      title="${mswEnabled ? 'Click to disable MSW (real network requests)' : 'Click to enable MSW (mocked requests)'}"
+    >
+      <span class="msw-toggle-dot"></span>
+      <span class="msw-toggle-label">MSW ${onOff}</span>
+    </button>
+  `;
+}
+
+/**
  * Render the modal overlay
  */
 export function renderModal(
   config: NormalizedConfig,
   currentValues: Record<string, string>,
-  isOpen: boolean
+  isOpen: boolean,
+  hasMswToggle: boolean = false,
+  mswEnabled: boolean = true,
+  handlerPanel?: HandlerPanel,
+  disabledHandlers: string[] = [],
 ): string {
   const openClass = isOpen ? ' open' : '';
 
@@ -106,14 +173,18 @@ export function renderModal(
       <div class="msw-modal" role="dialog" aria-modal="true" aria-labelledby="msw-modal-title">
         <div class="msw-modal-header">
           <h2 id="msw-modal-title" class="msw-modal-title">MSW Cockpit</h2>
-          <button class="msw-modal-close" aria-label="Close" data-close>
-            ✕
-          </button>
+          <div class="msw-modal-header-actions">
+            ${hasMswToggle ? renderMswToggle(mswEnabled) : ''}
+            <button class="msw-modal-close" aria-label="Close" data-close>
+              ✕
+            </button>
+          </div>
         </div>
         <div class="msw-modal-body">
-          ${config.dimensions.map(dimension =>
+          ${visibleDimensions(config, !!handlerPanel).map(dimension =>
             renderScenarioList(dimension, currentValues[dimension.id] || null)
           ).join('')}
+          ${handlerPanel ? renderHandlerList(handlerPanel.handlers, disabledHandlers) : ''}
         </div>
       </div>
     </div>

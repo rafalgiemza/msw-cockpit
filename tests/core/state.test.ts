@@ -133,3 +133,28 @@ describe('StateManager', () => {
     expect(listener).not.toHaveBeenCalled();
   });
 });
+
+describe('StateManager handler toggles', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('toggles, notifies and persists disabled handlers', () => {
+    const state = new StateManager(createMockConfig());
+    const listener = vi.fn();
+    state.onChange(listener);
+
+    state.toggleHandler('GET /a');
+    expect(state.getState().disabledHandlers).toEqual(['GET /a']);
+    expect(new StateManager(createMockConfig()).getDisabledHandlers()).toEqual(['GET /a']);
+
+    state.toggleHandler('GET /a', true);
+    expect(state.getDisabledHandlers()).toEqual([]);
+    expect(listener).toHaveBeenCalledTimes(2);
+  });
+
+  it('prunes unknown ids', () => {
+    const state = new StateManager(createMockConfig());
+    state.toggleHandler('GET /gone');
+    state.pruneDisabledHandlers(['GET /a']);
+    expect(state.getDisabledHandlers()).toEqual([]);
+  });
+});

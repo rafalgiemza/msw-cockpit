@@ -2,6 +2,7 @@ import type { NormalizedConfig } from "./types.js";
 import type { StateManager } from "./state.js";
 
 const STORAGE_KEY = "MSW_COCKPIT__SCENARIO";
+const DISABLED_HANDLERS_KEY = "MSW_COCKPIT__DISABLED_HANDLERS";
 
 /**
  * LocalStorage synchronizer for persisting state across tabs and sessions
@@ -11,7 +12,7 @@ const STORAGE_KEY = "MSW_COCKPIT__SCENARIO";
 export class LocalStorageSynchronizer {
   private storageListener: ((event: StorageEvent) => void) | null = null;
 
-  constructor(private state: StateManager, private config: NormalizedConfig) {
+  constructor(private state: StateManager, _config: NormalizedConfig) {
     this.setupListeners();
   }
 
@@ -78,6 +79,33 @@ export class LocalStorageSynchronizer {
       );
     }
     return null;
+  }
+
+  /**
+   * Read the persisted list of disabled handler IDs
+   */
+  static getDisabledHandlers(): string[] {
+    try {
+      const stored = localStorage.getItem(DISABLED_HANDLERS_KEY);
+      const parsed: unknown = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed)
+        ? parsed.filter((id): id is string => typeof id === "string")
+        : [];
+    } catch (error) {
+      console.error("[MSW Cockpit] Error reading from localStorage:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Persist the list of disabled handler IDs
+   */
+  static saveDisabledHandlers(ids: string[]): void {
+    try {
+      localStorage.setItem(DISABLED_HANDLERS_KEY, JSON.stringify(ids));
+    } catch (error) {
+      console.error("[MSW Cockpit] Error saving to localStorage:", error);
+    }
   }
 
   /**

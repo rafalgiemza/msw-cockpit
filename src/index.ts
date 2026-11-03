@@ -8,6 +8,7 @@ export { setupMswCockpit } from './enable.js';
 // Export types for TypeScript users
 export type {
   MswWorker,
+  HandlerInfo,
   Position,
   Theme,
   URLStrategy,

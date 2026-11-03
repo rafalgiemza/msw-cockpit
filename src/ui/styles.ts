@@ -126,6 +126,163 @@ export function getStyles(): string {
       align-items: center;
     }
 
+    .msw-modal-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* MSW Toggle */
+    .msw-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      transition: opacity 0.2s ease, transform 0.1s ease;
+    }
+
+    .msw-toggle:hover {
+      opacity: 0.85;
+      transform: scale(1.04);
+    }
+
+    .msw-toggle:focus {
+      outline: 2px solid #667eea;
+      outline-offset: 2px;
+    }
+
+    .msw-toggle--on {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .msw-toggle--off {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    :host([data-theme="dark"]) .msw-toggle--on {
+      background: #14532d;
+      color: #86efac;
+    }
+
+    :host([data-theme="dark"]) .msw-toggle--off {
+      background: #7f1d1d;
+      color: #fca5a5;
+    }
+
+    .msw-toggle-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .msw-toggle--on .msw-toggle-dot {
+      background: #22c55e;
+    }
+
+    .msw-toggle--off .msw-toggle-dot {
+      background: #ef4444;
+    }
+
+    .msw-handler-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .msw-handler {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--modal-border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 13px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .msw-handler:hover {
+      background: var(--hover-bg);
+    }
+
+    .msw-handler:focus {
+      outline: 2px solid #667eea;
+      outline-offset: 2px;
+    }
+
+    .msw-handler-method {
+      flex-shrink: 0;
+      min-width: 44px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .msw-handler-path {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .msw-handler--off .msw-handler-path {
+      opacity: 0.55;
+      text-decoration: line-through;
+    }
+
+    .msw-handler--off .msw-handler-method {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .msw-handler-switch {
+      flex-shrink: 0;
+      width: 32px;
+      height: 18px;
+      border-radius: 9px;
+      background: #22c55e;
+      position: relative;
+      transition: background 0.2s ease;
+    }
+
+    .msw-handler--off .msw-handler-switch {
+      background: #9ca3af;
+    }
+
+    .msw-handler-knob {
+      position: absolute;
+      top: 2px;
+      left: 16px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      transition: left 0.2s ease;
+    }
+
+    .msw-handler--off .msw-handler-knob {
+      left: 2px;
+    }
+
     .msw-modal-title {
       margin: 0;
       font-size: 20px;

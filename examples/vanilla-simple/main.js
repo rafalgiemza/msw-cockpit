@@ -1,4 +1,4 @@
-import { enableMockControls } from '../../dist/index.js';
+import { setupMswCockpit } from '../../dist/index.js';
 
 // Update current URL display
 function updateURLDisplay() {
@@ -17,7 +17,7 @@ function updateStateDisplay(state) {
 // Initialize on page load
 updateURLDisplay();
 
-const controls = enableMockControls({
+const controls = setupMswCockpit({
   scenarios: [
     'default',
     'error',

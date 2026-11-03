@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-11-03
+
+### Added
+
+- Per-handler toggles: the panel lists every handler of the passed `worker` and lets you switch each one between the mock and the real network (persisted in localStorage)
+- `controls.getHandlers()` and `controls.toggleHandler(id, enabled?)`; `disabledHandlers` in `getState()`
+- MSW on/off toggle in the panel (when the worker exposes `start`/`stop`)
+- `autoEnable` option (default `true`): sets the `MSW_COCKPIT__ENABLED` flag automatically, never when `NODE_ENV` is `production`
+
+### Changed
+
+- The active scenario (from URL or localStorage) is now applied to the worker on startup
+- Switching a scenario rebuilds the worker's handlers instead of stacking `use()` calls
+
+### Fixed
+
+- `examples/vanilla-simple` imported a non-existent `enableMockControls`
+
 ## [0.1.0] - 2024-12-21
 
 ### Added

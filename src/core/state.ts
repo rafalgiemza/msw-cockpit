@@ -13,6 +13,8 @@ import { LocalStorageSynchronizer } from './storage.js';
 export class StateManager {
   private values: Map<string, string> = new Map();
   private listeners: Set<StateListener> = new Set();
+  private mswEnabled: boolean = true;
+  private disabledHandlers: Set<string> = new Set(LocalStorageSynchronizer.getDisabledHandlers());
 
   constructor(private config: NormalizedConfig) {
     this.initialize();
@@ -60,7 +62,47 @@ export class StateManager {
     return {
       values: this.getValues(),
       url: window.location.href,
+      mswEnabled: this.mswEnabled,
+      disabledHandlers: this.getDisabledHandlers(),
     };
+  }
+
+  getDisabledHandlers(): string[] {
+    return [...this.disabledHandlers];
+  }
+
+  /**
+   * Switch a handler on or off (flips it when `enabled` is omitted)
+   */
+  toggleHandler(handlerId: string, enabled?: boolean): void {
+    const shouldDisable = enabled === undefined ? !this.disabledHandlers.has(handlerId) : !enabled;
+    if (shouldDisable === this.disabledHandlers.has(handlerId)) return;
+    if (shouldDisable) {
+      this.disabledHandlers.add(handlerId);
+    } else {
+      this.disabledHandlers.delete(handlerId);
+    }
+    LocalStorageSynchronizer.saveDisabledHandlers(this.getDisabledHandlers());
+    this.notify();
+  }
+
+  /**
+   * Forget persisted disabled IDs that no longer match any handler
+   */
+  pruneDisabledHandlers(knownIds: string[]): void {
+    const known = new Set(knownIds);
+    for (const id of this.disabledHandlers) {
+      if (!known.has(id)) this.disabledHandlers.delete(id);
+    }
+  }
+
+  getMswEnabled(): boolean {
+    return this.mswEnabled;
+  }
+
+  setMswEnabled(enabled: boolean): void {
+    this.mswEnabled = enabled;
+    this.notify();
   }
 
   /**

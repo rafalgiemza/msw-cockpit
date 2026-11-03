@@ -13,8 +13,26 @@ function isEnabled(): boolean {
   }
 }
 
+function isProductionBuild(): boolean {
+  try {
+    return typeof process !== "undefined" && process.env?.NODE_ENV === "production";
+  } catch {
+    return false;
+  }
+}
+
+function autoEnable(): void {
+  try {
+    localStorage.setItem(ENABLE_FLAG_KEY, "true");
+  } catch {
+    // localStorage unavailable — isEnabled() will report not enabled
+  }
+}
+
 /**
- * Initialize MSW Cockpit UI overlay for controlling mock scenarios
+ * Initialize MSW Cockpit UI overlay for controlling mock scenarios.
+ * Sets the MSW_COCKPIT__ENABLED localStorage flag itself unless `autoEnable: false`
+ * or NODE_ENV is "production".
  *
  * @param config - Configuration object (optional, supports zero-config)
  * @returns MockControlsInstance or null if not enabled/supported
@@ -35,6 +53,10 @@ function isEnabled(): boolean {
 export function setupMswCockpit(
   config?: MockControlsConfig,
 ): MockControlsInstance | null {
+  if (config?.autoEnable !== false && !isProductionBuild()) {
+    autoEnable();
+  }
+
   if (!isEnabled()) {
     warn(
       `Not enabled. To enable MSW Cockpit:\n\n` +

@@ -9,6 +9,7 @@
 ## ✨ Features
 
 - 🔄 **Hot-swap** - Instantly switches MSW handlers without page reload
+- 🎚️ **Per-handler toggles** - Switch individual MSW handlers on/off (mock ↔ real network) from the panel
 - 🎨 **Beautiful UI** - Floating control panel with smooth animations
 - 🔒 **Production Safe** - Requires localStorage flag to prevent accidental deployment
 - 📦 **Lightweight** - Only 5 KB gzipped
@@ -34,7 +35,13 @@ pnpm add msw-cockpit
 
 ### 1. Enable the Controls
 
-MSW Cockpit requires a localStorage flag to prevent accidental production deployment. Open your browser console and run:
+`setupMswCockpit()` sets the `MSW_COCKPIT__ENABLED` localStorage flag for you, except when `NODE_ENV` is `"production"`. Pass `autoEnable: false` to opt out and manage the flag yourself:
+
+```javascript
+setupMswCockpit({ worker, autoEnable: false });
+```
+
+Then enable it manually by running this in the browser console:
 
 ```javascript
 localStorage.setItem("MSW_COCKPIT__ENABLED", "true");
@@ -72,6 +79,31 @@ await worker.start();
 Look for the floating 🎭 button in the bottom-right corner of your page. Click it to open the scenario selector and switch between different mock states!
 
 ## 📖 Usage Examples
+
+### Per-Handler Toggles (zero scenarios needed)
+
+Pass your worker and the panel lists every handler it was created with. Click one to
+switch it off — requests to that endpoint then skip the mock and hit the real network.
+Choices persist in localStorage.
+
+```javascript
+const worker = setupWorker(...handlers);
+
+setupMswCockpit({ worker });
+await worker.start();
+```
+
+Programmatic control:
+
+```javascript
+controls.getHandlers(); // [{ id: 'GET /api/distributions', method: 'GET', path: '/api/distributions' }]
+controls.toggleHandler('GET /api/distributions'); // flip
+controls.toggleHandler('GET /api/distributions', false); // switch off
+```
+
+Requires a worker exposing `listHandlers()` (any `setupWorker()` result).
+Switched-off handlers are dropped with `worker.resetHandlers(...enabled)`, so avoid
+calling `worker.resetHandlers()` yourself while using this.
 
 ### Simple String Array
 
@@ -211,6 +243,7 @@ Main function to enable the controls. Returns `null` if not enabled or browser n
 | ------------- | ------------------------------------- | ------------ | ------------------------------------------------------------- |
 | `worker`      | `MswWorker`                           | **required** | MSW worker returned by `setupWorker()`                        |
 | `scenarios`   | `Array<string \| ScenarioDefinition>` | `[]`         | Array of scenario IDs or rich scenario objects                |
+| `autoEnable`  | `boolean`                             | `true`       | Set the `MSW_COCKPIT__ENABLED` flag automatically (never when `NODE_ENV` is `production`) |
 | `paramName`   | `string`                              | `'scenario'` | URL parameter name                                            |
 | `urlStrategy` | `'replace' \| 'push'`                 | `'replace'`  | How to update the URL (`replace` doesn't add history entries) |
 | `onChange`    | `(state: ScenarioState) => void`      | `undefined`  | Callback fired when scenario changes                          |

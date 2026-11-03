@@ -5,6 +5,23 @@
 export interface MswWorker {
   use: (...handlers: any[]) => void;
   resetHandlers: (...handlers: any[]) => void;
+  /** Present on MSW SetupWorkerApi — enables the MSW on/off toggle when provided */
+  start?: (options?: any) => Promise<void>;
+  stop?: () => void;
+  /** Present on MSW SetupWorkerApi — enables per-handler toggles when provided */
+  listHandlers?: () => readonly any[];
+}
+
+/**
+ * Description of a single MSW request handler shown in the cockpit
+ */
+export interface HandlerInfo {
+  /** Stable identifier (the handler's MSW header, e.g. "GET /api/users") */
+  id: string;
+  /** HTTP method or GraphQL operation type (may be empty) */
+  method: string;
+  /** Path / URL pattern or GraphQL operation name */
+  path: string;
 }
 
 /**
@@ -69,6 +86,10 @@ export interface ScenarioState {
   values: Record<string, string>;
   /** Current URL with applied params */
   url: string;
+  /** Whether MSW is currently active (always true when no worker provided) */
+  mswEnabled: boolean;
+  /** IDs of handlers switched off in the cockpit */
+  disabledHandlers: string[];
 }
 
 /**
@@ -90,7 +111,7 @@ export interface MockControlsConfig {
    * MSW worker instance for hot-swapping handlers on scenario change.
    * Must expose use() and resetHandlers() — pass the value returned by setupWorker().
    */
-  worker: MswWorker;
+  worker?: MswWorker;
 
   /**
    * Simple array of scenario IDs or rich scenario definitions
@@ -105,6 +126,14 @@ export interface MockControlsConfig {
    * @default 'scenario'
    */
   paramName?: string;
+
+  /**
+   * Set the MSW_COCKPIT__ENABLED localStorage flag automatically on setup.
+   * Never applies when NODE_ENV is "production". Set to false to require
+   * setting the flag manually.
+   * @default true
+   */
+  autoEnable?: boolean;
 
   /**
    * URL update strategy
@@ -155,7 +184,7 @@ export interface NormalizedConfig {
   dimensions: NormalizedDimension[];
   urlStrategy: URLStrategy;
   onChange?: StateListener;
-  worker: MswWorker;
+  worker?: MswWorker;
   ui: {
     position: Position;
     theme: Theme;
@@ -189,6 +218,22 @@ export interface MockControlsInstance {
    * @returns Unsubscribe function
    */
   onChange: (callback: StateListener) => Unsubscribe;
+
+  /**
+   * Toggle MSW on or off (only available when worker with start/stop is provided)
+   */
+  toggleMsw?: () => void;
+
+  /**
+   * List the worker's handlers (only available when worker.listHandlers is provided)
+   */
+  getHandlers: () => HandlerInfo[];
+
+  /**
+   * Switch a single handler on or off by ID. Omit `enabled` to flip it.
+   * Switched-off handlers are skipped, so their requests fall through to the real network.
+   */
+  toggleHandler: (handlerId: string, enabled?: boolean) => void;
 
   /**
    * Destroy the controls and clean up

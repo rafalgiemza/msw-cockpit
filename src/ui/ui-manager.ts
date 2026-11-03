@@ -2,7 +2,7 @@ import type { NormalizedConfig } from '../core/types.js';
 import type { StateManager } from '../core/state.js';
 import { CONTAINER_ID } from '../core/constants.js';
 import { getStyles } from './styles.js';
-import { renderTriggerButton, renderModal } from './templates.js';
+import { renderTriggerButton, renderModal, renderHandlerList, visibleDimensions, type HandlerPanel } from './templates.js';
 
 /**
  * UI Manager for Shadow DOM controls
@@ -19,7 +19,9 @@ export class UIManager {
   constructor(
     private state: StateManager,
     private config: NormalizedConfig,
-    private onScenarioApply: (dimensionId: string, scenarioId: string) => void
+    private onScenarioApply: (dimensionId: string, scenarioId: string) => void,
+    private onMswToggle?: () => void,
+    private handlerPanel?: HandlerPanel,
   ) {
     this.container = this.createContainer();
     this.shadowRoot = this.createShadowRoot();
@@ -75,7 +77,7 @@ export class UIManager {
   private render(): void {
     this.shadowRoot.innerHTML = `
       ${renderTriggerButton(this.config)}
-      ${renderModal(this.config, this.state.getValues(), this.isModalOpen)}
+      ${renderModal(this.config, this.state.getValues(), this.isModalOpen, !!this.onMswToggle, this.state.getMswEnabled(), this.handlerPanel, this.state.getDisabledHandlers())}
     `;
   }
 
@@ -85,23 +87,42 @@ export class UIManager {
   private updateUI(): void {
     const backdrop = this.shadowRoot.querySelector('.msw-backdrop');
     if (backdrop) {
-      // Toggle open class
       if (this.isModalOpen) {
         backdrop.classList.add('open');
       } else {
         backdrop.classList.remove('open');
       }
 
-      // Update modal body content with new state
       const modalBody = backdrop.querySelector('.msw-modal-body');
       if (modalBody) {
         const currentValues = this.state.getValues();
-        modalBody.innerHTML = this.config.dimensions.map(dimension => {
+        const focusedHandler = (this.shadowRoot.activeElement as HTMLElement | null)
+          ?.getAttribute?.('data-handler-id');
+        modalBody.innerHTML = visibleDimensions(this.config, !!this.handlerPanel).map(dimension => {
           const activeId = currentValues[dimension.id] || null;
           return this.renderScenarioList(dimension, activeId);
-        }).join('');
+        }).join('') + (this.handlerPanel
+          ? renderHandlerList(this.handlerPanel.handlers, this.state.getDisabledHandlers())
+          : '');
+        if (focusedHandler) {
+          const buttons = modalBody.querySelectorAll<HTMLElement>('[data-handler-id]');
+          Array.from(buttons).find(b => b.getAttribute('data-handler-id') === focusedHandler)?.focus();
+        }
       }
     }
+
+    this.updateToggleButton();
+  }
+
+  private updateToggleButton(): void {
+    const toggle = this.shadowRoot.querySelector<HTMLButtonElement>('.msw-toggle');
+    if (!toggle) return;
+    const enabled = this.state.getMswEnabled();
+    toggle.classList.toggle('msw-toggle--on', enabled);
+    toggle.classList.toggle('msw-toggle--off', !enabled);
+    toggle.setAttribute('aria-label', enabled ? 'Disable MSW' : 'Enable MSW');
+    const label = toggle.querySelector('.msw-toggle-label');
+    if (label) label.textContent = `MSW ${enabled ? 'ON' : 'OFF'}`;
   }
 
   /**
@@ -204,6 +225,20 @@ export class UIManager {
         if (target.hasAttribute('data-backdrop') || target.closest('[data-close]')) {
           this.closeModal();
         }
+        return;
+      }
+
+      // MSW toggle click
+      if (target.closest('[data-msw-toggle]')) {
+        this.onMswToggle?.();
+        return;
+      }
+
+      // Handler switch click (keeps the modal open)
+      const handlerButton = target.closest('[data-handler-id]');
+      if (handlerButton) {
+        const handlerId = handlerButton.getAttribute('data-handler-id');
+        if (handlerId) this.handlerPanel?.onToggle(handlerId);
         return;
       }
 

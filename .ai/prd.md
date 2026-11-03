@@ -138,6 +138,15 @@ I want to see descriptions for each scenario
 So that I understand what each option does without asking
 ```
 
+**US-10: MSW Toggle**
+
+```
+As a developer during a demo
+I want to toggle MSW on and off with a single click
+So that I can quickly compare real API responses vs mocked responses
+without touching code or reloading the page
+```
+
 ## Technical Requirements
 
 ### Architecture
@@ -351,7 +360,50 @@ interface MswWorker {
 - Passing an object without `use`/`resetHandlers` logs an error and returns `null`
 - Omitting `worker` entirely preserves URL-only behavior unchanged
 
-#### Feature 5: State Management
+#### Feature 5: MSW Toggle
+
+**Requirement:** The cockpit must expose a visible on/off toggle for MSW itself so the user can instantly compare real vs mocked API responses during a demo.
+
+**Behavior:**
+
+- Toggle is always visible in the cockpit UI (separate from the scenario panel)
+- **MSW active**: all handlers registered via `worker.use()` / `worker.resetHandlers()` are in effect — button shows "MSW ON" with a green indicator
+- **MSW inactive**: calls `worker.stop()` to unregister the Service Worker so real network requests flow through — button shows "MSW OFF" with a red indicator
+- Re-enabling calls `worker.start()` and re-applies the last active scenario's handlers (if any)
+- When `worker` is not provided the toggle is hidden (URL-only mode has nothing to stop/start)
+- Toggle state is persisted in the same storage used by the persistence config (if enabled)
+- `onChange` callback receives an additional `mswEnabled: boolean` field when the toggle changes
+
+**Implementation:**
+
+```typescript
+// Worker must expose start/stop in addition to use/resetHandlers
+interface MswWorker {
+  use: (...handlers: any[]) => void;
+  resetHandlers: (...handlers: any[]) => void;
+  start: (options?: any) => Promise<void>;
+  stop: () => void;
+}
+```
+
+> Note: `start()` / `stop()` are already part of the public MSW `SetupWorkerApi`. No additional peer dependency is required.
+
+**UI:**
+
+- Pill-shaped toggle button rendered in the cockpit header (top-right of the modal, or inline on the trigger button as a small badge)
+- Color: green (`#22c55e`) when active, red (`#ef4444`) when inactive
+- Label: "MSW" with a power icon; tooltip shows "Click to disable/enable MSW"
+- Disabled state (grey) when `worker` is absent
+
+**Acceptance Criteria:**
+
+- Clicking toggle while MSW is ON calls `worker.stop()` and updates UI to "OFF"
+- Clicking toggle while MSW is OFF calls `worker.start()` then re-applies last handlers (or `worker.resetHandlers()` for defaults) and updates UI to "ON"
+- Toggle state survives panel open/close cycles
+- If `worker.start()` rejects, log error and revert UI to OFF with a console warning
+- Toggle is hidden when no `worker` is provided
+
+#### Feature 6: State Management
 
 **URL Synchronization:**
 
@@ -470,6 +522,8 @@ function setupMswCockpit(
 interface MswWorker {
   use: (...handlers: any[]) => void;
   resetHandlers: (...handlers: any[]) => void;
+  start: (options?: any) => Promise<void>; // required for MSW toggle
+  stop: () => void; // required for MSW toggle
 }
 
 interface MockControlsConfig {
@@ -543,6 +597,7 @@ type Position = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 interface ScenarioState {
   values: Record<string, string>;
   url: string;
+  mswEnabled: boolean; // reflects current MSW toggle state
 }
 
 interface MockControlsInstance {
@@ -737,6 +792,10 @@ function useMockControls(config: MockControlsConfig): {
 ### Manual Testing Checklist
 
 - [ ] Enable/disable via localStorage works
+- [ ] MSW toggle turns MSW off (real network requests pass through)
+- [ ] MSW toggle turns MSW back on and re-applies last active scenario
+- [ ] MSW toggle hidden when no worker provided
+- [ ] MSW toggle state persisted across page reloads (when persistence enabled)
 - [ ] All position options render correctly
 - [ ] Modal opens/closes with all methods (click, ESC, outside)
 - [ ] URL updates on scenario change
@@ -906,6 +965,7 @@ function useMockControls(config: MockControlsConfig): {
 
 - v1.0 (2024-12-20): Initial PRD based on project planning discussion
 - v1.1 (2026-06-10): Added hot-swap worker integration (Feature 4); renamed entry point to `setupMswCockpit`; added `MswWorker` interface and `handlers` field on `ScenarioDefinition`; renumbered features 4→5 (State Management) and 4→6 (React Integration)
+- v1.2 (2026-06-11): Added MSW toggle (Feature 5, US-10); extended `MswWorker` with `start`/`stop`; added `mswEnabled` to `ScenarioState`; renumbered State Management→6, React Integration→7
 
 ---
 
