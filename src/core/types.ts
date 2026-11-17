@@ -6,7 +6,7 @@ export interface MswWorker {
   use: (...handlers: any[]) => void;
   resetHandlers: (...handlers: any[]) => void;
   /** Present on MSW SetupWorkerApi — enables the MSW on/off toggle when provided */
-  start?: (options?: any) => Promise<void>;
+  start?: (options?: any) => Promise<unknown>;
   stop?: () => void;
   /** Present on MSW SetupWorkerApi — enables per-handler toggles when provided */
   listHandlers?: () => readonly any[];
